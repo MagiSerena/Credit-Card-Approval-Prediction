@@ -1,0 +1,109 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="predict-layout fade-in">
+    <!-- Form Side -->
+    <div class="form-container">
+        <div class="glass-card">
+            <div class="form-header">
+                <h2>Credit Application</h2>
+                <p>Enter the details below to evaluate the credit profile.</p>
+            </div>
+            
+            <!-- Test Data Buttons -->
+            <div class="test-data-controls">
+                <h4>🧪 Test Information (Auto-fill)</h4>
+                <div class="test-btn-group">
+                    <button type="button" class="btn-outline" onclick="fillTestData('safe')">Load "Safe" Profile</button>
+                    <button type="button" class="btn-outline" onclick="fillTestData('risky')">Load "Risky" Profile</button>
+                    <button type="button" class="btn-outline" onclick="fillTestData('clear')">Clear Data</button>
+                </div>
+            </div>
+
+            <form action="/predict" method="POST" id="predictForm">
+                <div class="input-group">
+                    <label for="Age">Age</label>
+                    <input type="number" id="Age" name="Age" required placeholder="e.g. 28">
+                </div>
+                
+                <div class="input-group">
+                    <label for="Income">Annual Income ($)</label>
+                    <input type="number" id="Income" name="Income" required placeholder="e.g. 60000">
+                </div>
+                
+                <div class="input-group">
+                    <label for="Employment">Employment Status</label>
+                    <select id="Employment" name="Employment" required>
+                        <option value="" disabled selected>Select Status</option>
+                        <option value="Yes">Employed</option>
+                        <option value="No">Unemployed</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="CreditScore">Credit Score</label>
+                    <input type="number" id="CreditScore" name="CreditScore" required placeholder="e.g. 720">
+                </div>
+                
+                <div class="input-group">
+                    <label for="LoanAmount">Existing Loan Amount ($)</label>
+                    <input type="number" id="LoanAmount" name="LoanAmount" required placeholder="e.g. 5000">
+                </div>
+                
+                <div class="input-group">
+                    <label for="Married">Marital Status</label>
+                    <select id="Married" name="Married" required>
+                        <option value="" disabled selected>Select Status</option>
+                        <option value="Yes">Married</option>
+                        <option value="No">Single/Other</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn-primary" style="width: 100%; margin-top: 1rem;">Analyze Profile</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Info Side -->
+    <div class="info-container slide-up">
+        <div class="glass-card info-panel">
+            <h3>Model Context</h3>
+            <p>Our machine learning model analyzes 6 key data points to determine credit worthiness.</p>
+            
+            <ul class="info-list">
+                <li><strong>Age & Income:</strong> Stability indicators. Higher income generally correlates with better repayment rates.</li>
+                <li><strong>Employment:</strong> Active employment heavily influences approval odds.</li>
+                <li><strong>Credit Score:</strong> The historical track record. Scores above 700 are typically considered safe.</li>
+                <li><strong>Loan Amount:</strong> Existing debt burden impacts capacity for new credit.</li>
+            </ul>
+
+            <div style="margin-top: 2rem; padding: 1rem; border-radius: 8px; background: rgba(255,255,255,0.05);">
+                <h4 style="color: var(--accent-cyan); margin-bottom: 0.5rem;">Did you know?</h4>
+                <p style="font-size: 0.9rem; margin-bottom: 0;">The Random Forest model typically places the highest importance on Credit Score and Income when making a final decision.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function fillTestData(type) {
+        const form = document.getElementById('predictForm');
+        if (type === 'safe') {
+            form.Age.value = 32;
+            form.Income.value = 85000;
+            form.Employment.value = 'Yes';
+            form.CreditScore.value = 750;
+            form.LoanAmount.value = 10000;
+            form.Married.value = 'Yes';
+        } else if (type === 'risky') {
+            form.Age.value = 22;
+            form.Income.value = 25000;
+            form.Employment.value = 'No';
+            form.CreditScore.value = 450;
+            form.LoanAmount.value = 80000;
+            form.Married.value = 'No';
+        } else if (type === 'clear') {
+            form.reset();
+        }
+    }
+</script>
+{% endblock %}

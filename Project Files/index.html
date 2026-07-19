@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credit/Loan Predictor Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SweetAlert2 for notifications -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .gradient-text {
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        .loader {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top: 3px solid #38bdf8;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body class="antialiased min-h-screen flex flex-col relative overflow-x-hidden">
+    <!-- Background accents -->
+    <div
+        class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-sky-600 rounded-full mix-blend-multiply filter blur-[150px] opacity-30 pointer-events-none">
+    </div>
+    <div
+        class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-600 rounded-full mix-blend-multiply filter blur-[150px] opacity-30 pointer-events-none">
+    </div>
+
+    <!-- Navbar -->
+    <nav class="sticky top-0 z-50 glass-panel border-b border-white/10 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <svg class="w-8 h-8 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z">
+                    </path>
+                </svg>
+                <h1 class="text-2xl font-bold gradient-text tracking-tight">VantageCredit AI</h1>
+            </div>
+            <div class="hidden md:flex space-x-6 text-sm font-medium">
+                <a href="#predict" class="text-slate-300 hover:text-white transition-colors">Predictor</a>
+                <a href="#metrics" class="text-slate-300 hover:text-white transition-colors">Model Metrics</a>
+                <a href="#eda" class="text-slate-300 hover:text-white transition-colors">Data Insights</a>
+                <a href="#dataset" class="text-slate-300 hover:text-white transition-colors">Users Dataset</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 py-12 relative z-10 space-y-24">
+
+        <!-- Hero / Predictor Section -->
+        <section id="predict" class="scroll-mt-24">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl md:text-5xl font-extrabold mb-4">AI-Powered <span class="gradient-text">Credit
+                        Approvals</span></h2>
+                <p class="text-lg text-slate-400 max-w-2xl mx-auto">Leverage state-of-the-art ensemble machine learning
+                    models to predict credit card application outcomes instantly and accurately.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+                <!-- Form Side -->
+                <div
+                    class="lg:col-span-7 glass-panel rounded-2xl p-8 shadow-2xl shadow-indigo-500/10 border border-white/5 relative overflow-hidden group hover:border-sky-500/30 transition-colors duration-500">
+                    <div
+                        class="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                    </div>
+
+                    <h3 class="text-xl font-semibold mb-6 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                            </path>
+                        </svg>
+                        Applicant Profile
+                    </h3>
+
+                    <form id="predictForm" class="space-y-5 relative z-10">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                            <div>
+                                <label class="block text-sm font-medium text-slate-300 mb-1">Age (Years)</label>
+                                <input type="number" id="Age" required min="18" max="100"
+                                    class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all"
+                                    placeholder="e.g. 35">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-slate-300 mb-1">Annual Income ($)</label>
+                                <input type="number" id="Income" required min="0"
+                                    class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all"
+                                    placeholder="e.g. 75000">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-slate-300 mb-1">Credit Score</label>
+                                <input type="number" id="CreditScore" required min="300" max="850"
+                                    class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all"
+                                    placeholder="e.g. 720">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-slate-300 mb-1">Loan Amount Requested
+                                    ($)</label>
+                                <input type="number" id="LoanAmount" required min="500"
+                                    class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all"
+                                    placeholder="e.g. 15000">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-slate-300 mb-1">Employed?</label>
+                                <select id="Employment" required
+                                    class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all appearance-none">
+                                    <option value="" disabled selected>Select status...</option>
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-slate-300 mb-1">Married?</label>
+                                <select id="Married" required
+                                    class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all appearance-none">
+                                    <option value="" disabled selected>Select status...</option>
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 border-t border-white/10 mt-6 flex justify-between items-center">
+                            <span class="text-xs text-slate-500 cursor-help"
+                                title="Input constraints: Age(18-100), Income(>0), CreditScore(300-850)">Hover for
+                                Constraints</span>
+                            <button type="submit" id="submitBtn"
+                                class="bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-medium py-3 px-8 rounded-lg shadow-lg shadow-sky-500/25 transition-all transform hover:-translate-y-0.5 flex flex-row items-center justify-center min-w-[200px]">
+                                <span id="btnText">Run Prediction</span>
+                                <div id="btnLoader" class="loader ml-2 hidden"></div>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Result Side -->
+                <div class="lg:col-span-5 h-full flex flex-col justify-center items-center">
+                    <div id="resultState"
+                        class="w-full glass-panel rounded-2xl p-8 border border-white/5 text-center flex flex-col items-center justify-center min-h-[350px] transition-all">
+                        <!-- Idle State -->
+                        <div id="idleState">
+                            <div
+                                class="w-20 h-20 bg-slate-800/80 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/10">
+                                <svg class="w-10 h-10 text-slate-500" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                        d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-medium text-slate-300">Awaiting Data</h3>
+                            <p class="text-sm text-slate-500 mt-2">Fill the application details to generate an AI
+                                prediction.</p>
+                        </div>
+
+                        <!-- Prediction State -->
+                        <div id="predictionState" class="hidden w-full relative">
+                            <div
+                                class="absolute -top-4 -right-4 bg-sky-500/20 text-sky-400 text-xs px-3 py-1 rounded-full border border-sky-500/30 backdrop-blur-sm shadow-lg">
+                                AI Confidence: <span id="confText" class="font-bold">--%</span>
+                            </div>
+
+                            <div id="resultIcon"
+                                class="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl border-4 transition-all duration-700 scale-0 pointer-events-none">
+                                <!-- Icon inserted via JS -->
+                            </div>
+
+                            <h2 id="resultTitle"
+                                class="text-3xl font-extrabold mb-2 opacity-0 transition-opacity duration-700 delay-300">
+                                --</h2>
+                            <p id="resultDesc"
+                                class="text-slate-400 text-sm mb-6 opacity-0 transition-opacity duration-700 delay-500">
+                                Based on evaluating 6 data points.</p>
+
+                            <div class="bg-slate-900/50 rounded-lg p-4 text-left border border-white/5 opacity-0 transition-opacity duration-700 delay-700"
+                                id="statsBox">
+                                <div class="flex justify-between items-center py-2 border-b border-white/5">
+                                    <span class="text-xs text-slate-400">Class</span>
+                                    <span id="classPred" class="text-sm font-semibold">--</span>
+                                </div>
+                                <div class="flex justify-between items-center py-2">
+                                    <span class="text-xs text-slate-400">Class Probability</span>
+                                    <span id="probNum" class="text-sm font-semibold">--</span>
+                                </div>
+                                <div class="w-full bg-slate-700 rounded-full h-1.5 mt-2">
+                                    <div id="probBar" class="bg-sky-500 h-1.5 rounded-full transition-all duration-1000"
+                                        style="width: 0%"></div>
+                                </div>
+                            </div>
+
+                            <button type="button" onclick="resetForm()"
+                                class="mt-6 text-sm text-slate-400 hover:text-white transition-colors underline decoration-slate-600 underline-offset-4">Reset
+                                Application</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Divider -->
+        <div class="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+
+        <!-- Metrics Dashboard -->
+        <section id="metrics" class="scroll-mt-24">
+            <h2 class="text-3xl font-bold mb-8 flex items-center gap-3">
+                <svg class="w-7 h-7 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                    </path>
+                </svg>
+                Model Performance metrics
+            </h2>
+
+            {% if metrics %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                {% for row in metrics %}
+                <div
+                    class="glass-panel p-6 rounded-xl border border-white/5 hover:bg-white/[0.02] transition-colors relative group overflow-hidden">
+                    <div
+                        class="absolute inset-0 bg-gradient-to-r from-sky-500/10 to-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                    </div>
+                    <div class="flex justify-between items-start mb-4">
+                        <h4 class="font-bold text-lg text-white">{{ row.Model }}</h4>
+                        {% if row['F1-Score'] > 0.96 %}
+                        <span
+                            class="bg-emerald-500/20 text-emerald-400 text-[10px] uppercase font-bold px-2 py-0.5 rounded-full border border-emerald-500/20">Best
+                            Model</span>
+                        {% endif %}
+                    </div>
+                    <div class="space-y-3">
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-400">Accuracy</span>
+                                <span class="font-medium font-mono text-slate-300">{{ "%.2f"|format(row.Accuracy * 100)
+                                    }}%</span>
+                            </div>
+                            <div class="w-full bg-slate-800 rounded-full h-1">
+                                <div class="bg-sky-400 h-1 rounded-full" style="width: {{ row.Accuracy * 100 }}%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-400">F1-Score</span>
+                                <span class="font-medium font-mono text-slate-300">{{ "%.4f"|format(row['F1-Score'])
+                                    }}</span>
+                            </div>
+                            <div class="w-full bg-slate-800 rounded-full h-1">
+                                <div class="bg-indigo-400 h-1 rounded-full" style="width: {{ row['F1-Score'] * 100 }}%">
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-400">ROC-AUC</span>
+                                <span class="font-medium font-mono text-slate-300">{{ "%.4f"|format(row['ROC-AUC'])
+                                    }}</span>
+                            </div>
+                            <div class="w-full bg-slate-800 rounded-full h-1">
+                                <div class="bg-purple-400 h-1 rounded-full" style="width: {{ row['ROC-AUC'] * 100 }}%">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Feature Importance Graph -->
+                <div class="glass-panel p-4 rounded-xl border border-white/5 flex flex-col items-center">
+                    <h4 class="text-sm font-semibold uppercase text-slate-400 tracking-wider mb-4 w-full text-center">
+                        Feature Importance</h4>
+                    <div
+                        class="relative w-full aspect-video rounded-lg overflow-hidden bg-slate-900 border border-white/5 flex items-center justify-center group">
+                        <img src="{{ url_for('static', filename='images/feature_importance.png') }}"
+                            alt="Feature Importance"
+                            class="object-contain w-full h-full p-2 group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                </div>
+                <!-- Best Model CM -->
+                <div class="glass-panel p-4 rounded-xl border border-white/5 flex flex-col items-center">
+                    <h4 class="text-sm font-semibold uppercase text-slate-400 tracking-wider mb-4 w-full text-center">
+                        Confusion Matrix (Random Forest)</h4>
+                    <div
+                        class="relative w-full aspect-video rounded-lg overflow-hidden bg-slate-900 border border-white/5 flex items-center justify-center group">
+                        <img src="{{ url_for('static', filename='images/cm_random_forest.png') }}"
+                            alt="Confusion Matrix"
+                            class="object-contain w-full h-full p-2 group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Divider -->
+        <div class="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+
+        <!-- EDA Gallery -->
+        <section id="eda" class="scroll-mt-24 pb-12">
+            <h2 class="text-3xl font-bold mb-8 flex items-center gap-3">
+                <svg class="w-7 h-7 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                    </path>
+                </svg>
+                Data Insights
+            </h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for img in eda_images %}
+                {% if 'cm_' not in img and 'feature_importance' not in img %}
+                <div class="glass-panel rounded-xl overflow-hidden border border-white/5 group relative">
+                    <div class="aspect-[4/3] bg-slate-900 overflow-hidden">
+                        <img src="{{ url_for('static', filename='images/' ~ img) }}" alt="{{ img }}"
+                            class="w-full h-full object-contain p-4 group-hover:scale-110 transition-transform duration-700">
+                    </div>
+                    <div class="px-4 py-3 border-t border-white/5 bg-slate-800/80">
+                        <p class="text-xs text-slate-300 font-medium truncate capitalize">{{ img|replace('.png',
+                            '')|replace('_', ' ') }}</p>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Divider -->
+        <div class="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+
+        <!-- Users Dataset -->
+        <section id="dataset" class="scroll-mt-24 pb-12">
+            <h2 class="text-3xl font-bold mb-8 flex items-center gap-3">
+                <svg class="w-7 h-7 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
+                    </path>
+                </svg>
+                Users Dataset {% if users %}({{ users|length }} records){% endif %}
+            </h2>
+
+            {% if users %}
+            <div class="glass-panel rounded-xl overflow-hidden border border-white/5 relative">
+                <div class="overflow-x-auto max-h-[500px]">
+                    <table class="w-full text-sm text-left text-slate-300 whitespace-nowrap">
+                        <thead
+                            class="text-xs text-slate-400 uppercase bg-slate-800/80 sticky top-0 z-10 border-b border-white/10">
+                            <tr>
+                                <th scope="col" class="px-6 py-4">Age</th>
+                                <th scope="col" class="px-6 py-4">Income ($)</th>
+                                <th scope="col" class="px-6 py-4">Employment</th>
+                                <th scope="col" class="px-6 py-4">Credit Score</th>
+                                <th scope="col" class="px-6 py-4">Loan Amount ($)</th>
+                                <th scope="col" class="px-6 py-4">Married</th>
+                                <th scope="col" class="px-6 py-4">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-white/5">
+                            {% for user in users %}
+                            <tr class="hover:bg-white/[0.02] transition-colors">
+                                <td class="px-6 py-3 font-medium text-white">{{ user.Age }}</td>
+                                <td class="px-6 py-3">{{ user.Income }}</td>
+                                <td class="px-6 py-3">
+                                    <span class="px-2 py-1 rounded-full text-[10px] uppercase font-bold
+                                        {% if user.Employment == 'Yes' %} bg-emerald-500/20 text-emerald-400 border border-emerald-500/20
+                                        {% else %} bg-rose-500/20 text-rose-400 border border-rose-500/20 {% endif %}">
+                                        {{ user.Employment }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-3">{{ user.CreditScore }}</td>
+                                <td class="px-6 py-3">{{ user.LoanAmount }}</td>
+                                <td class="px-6 py-3">{{ user.Married }}</td>
+                                <td class="px-6 py-3">
+                                    <span class="px-2 py-1 rounded-full text-[10px] uppercase font-bold
+                                        {% if user.Approved == 0 %} bg-emerald-500/20 text-emerald-400 border border-emerald-500/20
+                                        {% else %} bg-rose-500/20 text-rose-400 border border-rose-500/20 {% endif %}">
+                                        {% if user.Approved == 0 %}Approved{% else %}Rejected{% endif %}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% else %}
+            <p class="text-slate-400">No user data available.</p>
+            {% endif %}
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/10 bg-slate-900/50 backdrop-blur-md py-8">
+        <div
+            class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center text-sm text-slate-500">
+            <p>&copy; 2026 VantageCredit AI System. All rights reserved.</p>
+            <div class="flex gap-4 mt-4 md:mt-0">
+                <a href="/features" target="_blank" class="hover:text-sky-400 transition-colors">API Docs
+                    (/features)</a>
+                <a href="/health" target="_blank" class="hover:text-emerald-400 transition-colors">System Health
+                    (/health)</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const form = document.getElementById('predictForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+        const btnLoader = document.getElementById('btnLoader');
+
+        const idleState = document.getElementById('idleState');
+        const predictionState = document.getElementById('predictionState');
+
+        const resultIcon = document.getElementById('resultIcon');
+        const resultTitle = document.getElementById('resultTitle');
+        const resultDesc = document.getElementById('resultDesc');
+        const confText = document.getElementById('confText');
+
+        const statsBox = document.getElementById('statsBox');
+        const classPred = document.getElementById('classPred');
+        const probNum = document.getElementById('probNum');
+        const probBar = document.getElementById('probBar');
+
+        function setPredictingState(isPredicting) {
+            submitBtn.disabled = isPredicting;
+            if (isPredicting) {
+                btnText.innerText = "Analyzing...";
+                btnLoader.classList.remove('hidden');
+                submitBtn.classList.add('opacity-80', 'cursor-not-allowed');
+            } else {
+                btnText.innerText = "Run Prediction";
+                btnLoader.classList.add('hidden');
+                submitBtn.classList.remove('opacity-80', 'cursor-not-allowed');
+            }
+        }
+
+        function resetForm() {
+            form.reset();
+            predictionState.classList.add('hidden');
+            idleState.classList.remove('hidden');
+
+            // Remove transform classes to reset animations
+            resultIcon.classList.remove('scale-100');
+            resultIcon.classList.add('scale-0');
+            resultTitle.classList.remove('opacity-100');
+            resultTitle.classList.add('opacity-0');
+            resultDesc.classList.remove('opacity-100');
+            resultDesc.classList.add('opacity-0');
+            statsBox.classList.remove('opacity-100');
+            statsBox.classList.add('opacity-0');
+            probBar.style.width = '0%';
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const payload = {
+                Age: document.getElementById('Age').value,
+                Income: document.getElementById('Income').value,
+                CreditScore: document.getElementById('CreditScore').value,
+                LoanAmount: document.getElementById('LoanAmount').value,
+                Employment: document.getElementById('Employment').value,
+                Married: document.getElementById('Married').value
+            };
+
+            setPredictingState(true);
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Server error during prediction');
+                }
+
+                // Show Result UI
+                idleState.classList.add('hidden');
+                predictionState.classList.remove('hidden');
+
+                // Build UI based on outcome
+                const isApproved = data.prediction === 0;
+
+                // Icon
+                if (isApproved) {
+                    resultIcon.className = "w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl border-4 transition-all duration-700 shadow-emerald-500/20 border-emerald-500/30 bg-emerald-500/10 text-emerald-400 scale-0 pointer-events-none";
+                    resultIcon.innerHTML = `<svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+                    resultTitle.innerText = "Approved";
+                    resultTitle.className = "text-3xl font-extrabold mb-2 transition-opacity duration-700 delay-300 opacity-0 text-emerald-400";
+                    probBar.className = "h-1.5 rounded-full transition-all duration-1000 bg-emerald-500";
+                } else {
+                    resultIcon.className = "w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl border-4 transition-all duration-700 shadow-rose-500/20 border-rose-500/30 bg-rose-500/10 text-rose-400 scale-0 pointer-events-none";
+                    resultIcon.innerHTML = `<svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>`;
+                    resultTitle.innerText = "Rejected";
+                    resultTitle.className = "text-3xl font-extrabold mb-2 transition-opacity duration-700 delay-300 opacity-0 text-rose-400";
+                    probBar.className = "h-1.5 rounded-full transition-all duration-1000 bg-rose-500";
+                }
+
+                confText.innerText = data.confidence;
+                classPred.innerText = `Class ${data.prediction} (${data.status})`;
+
+                let probVal = data.probability;
+                probNum.innerText = (probVal * 100).toFixed(2) + "%";
+
+                // Trigger Animations
+                setTimeout(() => {
+                    resultIcon.classList.remove('scale-0');
+                    resultIcon.classList.add('scale-100');
+                }, 50);
+                setTimeout(() => {
+                    resultTitle.classList.remove('opacity-0');
+                    resultTitle.classList.add('opacity-100');
+                    resultDesc.classList.remove('opacity-0');
+                    resultDesc.classList.add('opacity-100');
+                }, 300);
+                setTimeout(() => {
+                    statsBox.classList.remove('opacity-0');
+                    statsBox.classList.add('opacity-100');
+                    probBar.style.width = (probVal * 100) + "%";
+                }, 600);
+
+            } catch (err) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Prediction Failed',
+                    text: err.message,
+                    background: '#1e293b',
+                    color: '#f8fafc',
+                    confirmButtonColor: '#0ea5e9'
+                });
+                resetForm();
+            } finally {
+                setPredictingState(false);
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="result-container fade-in glass-card">
+    
+    {% if status == 'approved' %}
+        <div class="result-icon status-approved">✅</div>
+        <h2 style="color: var(--accent-success); margin-bottom: 1rem;">Application Approved</h2>
+        <p class="prediction-text">{{ prediction_text }}</p>
+    {% elif status == 'rejected' %}
+        <div class="result-icon status-rejected">❌</div>
+        <h2 style="color: var(--accent-danger); margin-bottom: 1rem;">Application Declined</h2>
+        <p class="prediction-text">{{ prediction_text }}</p>
+    {% else %}
+        <div class="result-icon status-error">⚠️</div>
+        <h2 style="color: #FFC107; margin-bottom: 1rem;">System Notice</h2>
+        <p class="prediction-text">{{ prediction_text }}</p>
+    {% endif %}
+
+    {% if data %}
+    <div class="data-summary slide-up" style="animation-delay: 0.3s;">
+        <h4 style="margin-bottom: 1rem; color: var(--text-secondary); border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem;">Profile Summary</h4>
+        {% for key, value in data.items() %}
+        <div class="data-row">
+            <span class="data-label">{{ key }}</span>
+            <span class="data-value">{{ value }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <a href="/predict" class="btn-primary" style="margin-top: 2rem;">Analyze Another Profile</a>
+</div>
+{% endblock %}
